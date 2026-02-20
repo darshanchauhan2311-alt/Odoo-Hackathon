@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DataStream — Mobile Data Packages</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- =================== GOOGLE ACCOUNT PICKER =================== -->
+<div class="gpicker-overlay" id="gPicker">
+  <div class="gpicker-box">
+    <div class="gpicker-header">
+      <svg width="24" height="24" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      <div class="gpicker-header-text">
+        <div class="gpicker-title">Choose an account</div>
+        <div class="gpicker-sub">to continue to DataStream</div>
+      </div>
+    </div>
+    <div id="gAccountList"></div>
+    <hr class="gpicker-divider">
+    <div class="gpicker-add" onclick="addGoogleAccount()">
+      <div class="gpicker-add-icon">+</div>
+      <span>Use another account</span>
+    </div>
+    <div class="gpicker-footer">
+      <button class="gpicker-cancel" onclick="closeGPicker()">Cancel</button>
+    </div>
+  </div>
+</div>
+
+<!-- =================== LOGIN PAGE =================== -->
+<div id="loginPage" class="page active">
+  <div class="login-bg"></div>
+  <div class="login-grid"></div>
+
+  <div class="login-left">
+    <div class="login-logo">Data<span>Stream</span></div>
+    <div class="login-badge">
+      <span style="width:6px;height:6px;background:var(--accent);border-radius:50%;display:inline-block;animation:pulse 1.5s infinite;"></span>
+      System Online — 99.9% Uptime
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="loginForm">
+      <div class="login-title">Welcome Back</div>
+      <div class="login-sub">Sign in to manage your data packages, monitor usage, and stay connected globally.</div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="loginEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div id="emailError" class="form-error">Please enter a valid email address.</div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+      </div>
+      <div id="passError" class="form-error">Password must be at least 6 characters.</div>
+      <div class="form-row">
+        <label class="form-check"><input type="checkbox"> Remember me</label>
+        <a href="#" class="form-link" onclick="event.preventDefault();showToast('📧 Password reset link sent!')">Forgot Password?</a>
+      </div>
+      <button class="btn-login" onclick="handleLogin()">Sign In →</button>
+      <div class="login-divider">— or continue with —</div>
+      <button class="btn-google" onclick="openGPicker()">
+        <svg width="18" height="18" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Sign in with Google
+      </button>
+      <div class="login-footer-text">Don't have an account? <a href="#" onclick="event.preventDefault();showSignup()">Create one free →</a></div>
+    </div>
+
+    <!-- SIGNUP FORM -->
+    <div id="signupForm" style="display:none;">
+      <div class="login-title">Create Account</div>
+      <div class="login-sub">Join 4.2 million users on the fastest mobile data network.</div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="signupName" placeholder="John Doe" autocomplete="name">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="signupEmail" placeholder="you@example.com" autocomplete="email">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="signupPassword" placeholder="Min. 6 characters" autocomplete="new-password">
+      </div>
+      <div id="signupError" class="form-error">Please fill all fields correctly.</div>
+      <button class="btn-login" onclick="handleSignup()">Create Account →</button>
+      <div class="login-footer-text" style="margin-top:1rem;">Already have an account? <a href="#" onclick="event.preventDefault();showLogin()">Sign in →</a></div>
+    </div>
+  </div>
+
+  <!-- RIGHT VISUAL -->
+  <div class="login-right">
+    <div class="login-visual">
+      <div class="visual-card">
+        <div class="visual-ping"><div class="ping-dot"></div></div>
+        <div style="font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem;">Your Dashboard</div>
+        <div style="font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;color:var(--accent);letter-spacing:-2px;line-height:1;">50<span style="font-size:1.1rem;font-weight:400">GB</span></div>
+        <div style="font-size:.72rem;color:var(--muted);margin-top:.3rem;margin-bottom:1rem;">Pro Plan — 22.4GB used</div>
+        <div style="margin-bottom:.8rem;"><div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-bottom:.3rem;"><span>Data Used</span><span style="color:var(--accent)">44.8%</span></div><div class="vbar"><div class="vfill" style="width:44.8%;background:var(--accent)"></div></div></div>
+        <div style="margin-bottom:.8rem;"><div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-bottom:.3rem;"><span>Hotspot</span><span style="color:var(--accent3)">31%</span></div><div class="vbar"><div class="vfill" style="width:31%;background:var(--accent3)"></div></div></div>
+        <div><div style="display:flex;justify-content:space-between;font-size:.68rem;color:var(--muted);margin-bottom:.3rem;"><span>Roaming</span><span style="color:var(--accent2)">8%</span></div><div class="vbar"><div class="vfill" style="width:8%;background:var(--accent2)"></div></div></div>
+        <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border);font-size:.68rem;color:var(--muted);display:flex;justify-content:space-between;"><span>↓ 1.2 Gbps</span><span>↑ 480 Mbps</span><span>12ms</span></div>
+      </div>
+      <div style="margin-top:1rem;padding:1rem 1.2rem;background:rgba(0,245,196,.04);border:1px solid var(--border);font-size:.72rem;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--accent)">✓</span> Rollover data active<br>
+        <span style="color:var(--accent)">✓</span> 5G connected — 3 devices<br>
+        <span style="color:var(--accent)">✓</span> VPN protection on
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MAIN PAGE =================== -->
+<div id="mainPage" class="page">
+
+  <nav id="mainNav">
+    <div class="logo">Data<span>Stream</span></div>
+
+    <button class="nav-hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+      <span></span><span></span><span></span>
+    </button>
+
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#" onclick="event.preventDefault();navTo('plans')">Plans</a></li>
+      <li><a href="#" onclick="event.preventDefault();navTo('features')">Features</a></li>
+      <li><a href="#" onclick="event.preventDefault();navTo('speed')">Speed</a></li>
+      <li><a href="#" onclick="event.preventDefault();navTo('coverage')">Coverage</a></li>
+    </ul>
+
+    <!-- User Avatar + Dropdown -->
+    <div class="nav-right">
+      <div style="position:relative;">
+        <button class="user-avatar-btn" id="avatarBtn" onclick="toggleDropdown()" aria-label="Account menu">
+          <div class="user-avatar" id="navAvatar" style="background:#7b5cf0;">
+            <span id="navAvatarInitial">U</span>
+          </div>
+          <span class="user-name-text" id="navUsername">User</span>
+          <span class="avatar-caret">▼</span>
+        </button>
+        <div class="avatar-dropdown" id="avatarDropdown">
+          <div class="dropdown-header">
+            <div class="dropdown-avatar-row">
+              <div class="dropdown-avatar" id="dropdownAvatar" style="background:#7b5cf0;"></div>
+              <div>
+                <div class="dropdown-fullname" id="dropdownName">User</div>
+                <div class="dropdown-email" id="dropdownEmail">user@datastream.com</div>
+              </div>
+            </div>
+          </div>
+          <button class="dropdown-item" onclick="navTo('plans');closeDropdown()">📦 My Plans</button>
+          <button class="dropdown-item" onclick="showToast('⚙️ Settings coming soon!');closeDropdown()">⚙️ Settings</button>
+          <button class="dropdown-item" onclick="showToast('📊 Usage report opening!');closeDropdown()">📊 Usage Report</button>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item danger" onclick="handleLogout()">↩ Sign Out</button>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-bg"></div>
+    <div class="grid-overlay"></div>
+    <div class="hero-content">
+      <div class="hero-badge">⬡ Next-Gen Mobile Data</div>
+      <h1>Stay Connected,<span class="line2">Always On.</span></h1>
+      <p>Ultra-fast 5G data packages designed for the way you live. No throttling, no hidden fees — just raw, reliable speed wherever you go.</p>
+      <div class="hero-actions">
+        <button class="btn-primary" onclick="navTo('plans')">Explore Plans →</button>
+        <button class="btn-ghost" onclick="navTo('coverage')">Check Coverage</button>
+      </div>
+    </div>
+    <div class="usage-widget">
+      <div class="widget-title"><span class="pulse-dot"></span>Live Network Status</div>
+      <div class="usage-bar-wrap">
+        <div class="usage-label"><span>5G Coverage</span><span style="color:var(--accent)">98.4%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:98%;background:var(--accent)"></div></div>
+      </div>
+      <div class="usage-bar-wrap">
+        <div class="usage-label"><span>4G LTE</span><span style="color:var(--accent3)">99.9%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:100%;background:var(--accent3)"></div></div>
+      </div>
+      <div class="usage-bar-wrap">
+        <div class="usage-label"><span>Network Load</span><span style="color:var(--accent2)">41%</span></div>
+        <div class="usage-bar"><div class="usage-fill" style="width:41%;background:var(--accent2)"></div></div>
+      </div>
+      <div style="margin-top:1.2rem;font-size:.65rem;color:var(--muted);">↑ 2.4 GB/s &nbsp; ↓ 8.1 GB/s &nbsp; 12ms avg</div>
+    </div>
+  </section>
+
+  <div class="ticker">
+    <div class="ticker-inner">
+      <span class="ticker-accent">◆</span> 5G SPEEDS UP TO 2.4 GBPS <span class="ticker-accent">◆</span> ZERO THROTTLING <span class="ticker-accent">◆</span> 99.9% UPTIME GUARANTEED <span class="ticker-accent">◆</span> 180+ COUNTRIES <span class="ticker-accent">◆</span> FREE SIM DELIVERY <span class="ticker-accent">◆</span> 5G SPEEDS UP TO 2.4 GBPS <span class="ticker-accent">◆</span> ZERO THROTTLING <span class="ticker-accent">◆</span> 99.9% UPTIME GUARANTEED <span class="ticker-accent">◆</span> 180+ COUNTRIES <span class="ticker-accent">◆</span> FREE SIM DELIVERY <span class="ticker-accent">◆</span>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><span class="stat-value" data-count="4.2">0</span><div class="stat-label">Million Users</div></div>
+    <div class="stat"><span class="stat-value" data-count="180">0</span><div class="stat-label">Countries</div></div>
+    <div class="stat"><span class="stat-value" data-count="99.9">0</span><div class="stat-label">% Uptime</div></div>
+  </div>
+
+  <!-- PLANS -->
+  <section class="section" id="plans">
+    <div class="section-header">
+      <div class="section-tag">// Data Packages</div>
+      <div class="section-title">Choose Your Plan</div>
+      <div class="billing-toggle">
+        <span>Monthly</span>
+        <div class="toggle-switch" id="billingToggle" onclick="toggleBilling()"><div class="toggle-knob"></div></div>
+        <span>Annual</span>
+        <span class="save-badge">SAVE 20%</span>
+      </div>
+    </div>
+    <div class="plans-grid">
+      <div class="plan-card">
+        <div class="plan-name">Starter</div>
+        <div class="plan-data">5<span>GB</span></div>
+        <div class="plan-price"><strong class="plan-price-val" data-monthly="4.99" data-annual="3.99">$4.99</strong>/ mo</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="active"><span class="feat-icon">✓</span> 5GB High-Speed Data</li>
+          <li class="active"><span class="feat-icon">✓</span> 4G LTE Network</li>
+          <li class="active"><span class="feat-icon">✓</span> Unlimited Calls & SMS</li>
+          <li class="active"><span class="feat-icon">✓</span> 1 Device</li>
+          <li><span class="feat-icon off">✗</span> Hotspot Tethering</li>
+          <li><span class="feat-icon off">✗</span> 5G Access</li>
+          <li><span class="feat-icon off">✗</span> International Roaming</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="openPlanModal('Starter','5GB','4.99','ms-outline')">Get Starter →</button>
+      </div>
+      <div class="plan-card">
+        <div class="plan-name">Basic</div>
+        <div class="plan-data">15<span>GB</span></div>
+        <div class="plan-price"><strong class="plan-price-val" data-monthly="9.99" data-annual="7.99">$9.99</strong>/ mo</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="active"><span class="feat-icon">✓</span> 15GB High-Speed Data</li>
+          <li class="active"><span class="feat-icon">✓</span> 4G LTE Network</li>
+          <li class="active"><span class="feat-icon">✓</span> Unlimited Calls & SMS</li>
+          <li class="active"><span class="feat-icon">✓</span> Up to 2 Devices</li>
+          <li class="active"><span class="feat-icon">✓</span> Hotspot (5GB)</li>
+          <li><span class="feat-icon off">✗</span> 5G Access</li>
+          <li><span class="feat-icon off">✗</span> International Roaming</li>
+        </ul>
+        <button class="plan-btn plan-btn-outline" onclick="openPlanModal('Basic','15GB','9.99','ms-outline')">Get Basic →</button>
+      </div>
+      <div class="plan-card featured">
+        <div class="plan-badge badge-featured">Most Popular</div>
+        <div class="plan-name">Pro</div>
+        <div class="plan-data" style="color:var(--accent)">50<span>GB</span></div>
+        <div class="plan-price"><strong class="plan-price-val" data-monthly="19.99" data-annual="15.99">$19.99</strong>/ mo</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="active"><span class="feat-icon">✓</span> 50GB High-Speed Data</li>
+          <li class="active"><span class="feat-icon">✓</span> 5G + 4G LTE Network</li>
+          <li class="active"><span class="feat-icon">✓</span> Unlimited Calls & SMS</li>
+          <li class="active"><span class="feat-icon">✓</span> Up to 5 Devices</li>
+          <li class="active"><span class="feat-icon">✓</span> Hotspot (20GB)</li>
+          <li class="active"><span class="feat-icon">✓</span> 5G Access</li>
+          <li><span class="feat-icon off">✗</span> International Roaming</li>
+        </ul>
+        <button class="plan-btn plan-btn-accent" onclick="openPlanModal('Pro','50GB','19.99','ms-accent')">Get Pro →</button>
+      </div>
+      <div class="plan-card popular">
+        <div class="plan-badge badge-popular">Best Value</div>
+        <div class="plan-name">Ultra</div>
+        <div class="plan-data" style="color:var(--accent3)">100<span>GB</span></div>
+        <div class="plan-price"><strong class="plan-price-val" data-monthly="34.99" data-annual="27.99">$34.99</strong>/ mo</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> 100GB High-Speed Data</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> Priority 5G Network</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> Unlimited Calls & SMS</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> Up to 10 Devices</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> Unlimited Hotspot</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> 5G Priority Access</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent3)">✓</span> Roaming (30 countries)</li>
+        </ul>
+        <button class="plan-btn plan-btn-purple" onclick="openPlanModal('Ultra','100GB','34.99','ms-purple')">Get Ultra →</button>
+      </div>
+      <div class="plan-card enterprise">
+        <div class="plan-badge badge-enterprise">Enterprise</div>
+        <div class="plan-name">Unlimited</div>
+        <div class="plan-data" style="color:var(--accent2)">∞<span style="font-size:1rem"> GB</span></div>
+        <div class="plan-price"><strong class="plan-price-val" data-monthly="59.99" data-annual="47.99">$59.99</strong>/ mo</div>
+        <div class="plan-divider"></div>
+        <ul class="plan-features">
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Truly Unlimited Data</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Dedicated 5G Slice</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Unlimited Calls & SMS</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Unlimited Devices</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Unlimited Hotspot</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Global Roaming (180+)</li>
+          <li class="active"><span class="feat-icon" style="color:var(--accent2)">✓</span> Dedicated Account Manager</li>
+        </ul>
+        <button class="plan-btn plan-btn-orange" onclick="openContactModal()">Contact Sales →</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features" style="padding-top:0;">
+    <div class="section-header">
+      <div class="section-tag">// Why DataStream</div>
+      <div class="section-title">Built Different</div>
+    </div>
+    <div class="features-grid">
+      <div class="feature-item"><span class="feature-icon">⚡</span><div class="feature-title">Zero Throttling</div><div class="feature-desc">Full speed all month long. We never slow your data — even at peak hours.</div></div>
+      <div class="feature-item"><span class="feature-icon">🌍</span><div class="feature-title">Global Coverage</div><div class="feature-desc">Stay connected in 180+ countries with automatic network switching.</div></div>
+      <div class="feature-item"><span class="feature-icon">🔒</span><div class="feature-title">Built-in VPN</div><div class="feature-desc">Enterprise-grade VPN on every plan. Your data is encrypted end-to-end.</div></div>
+      <div class="feature-item"><span class="feature-icon">📊</span><div class="feature-title">Real-Time Analytics</div><div class="feature-desc">Track usage live and get alerts before you run out. Top-up instantly.</div></div>
+      <div class="feature-item"><span class="feature-icon">🔄</span><div class="feature-title">Rollover Data</div><div class="feature-desc">Unused data rolls over on Pro and above. Never waste what you paid for.</div></div>
+      <div class="feature-item"><span class="feature-icon">💬</span><div class="feature-title">24/7 Support</div><div class="feature-desc">Real humans, any time. No bots — support in under 2 minutes.</div></div>
+    </div>
+  </section>
+
+  <!-- SPEED -->
+  <div class="speed-section" id="speed">
+    <div class="speed-grid">
+      <div>
+        <div class="section-tag">// Network Performance</div>
+        <div class="section-title">Speed You Can Feel</div>
+        <p style="color:var(--muted);font-size:.85rem;margin-top:1rem;line-height:1.8;">Powered by the latest 5G infrastructure with mmWave and Sub-6GHz. From 8K streaming to zero-lag gaming.</p>
+        <div style="margin-top:2rem;display:flex;gap:2rem;font-size:.75rem;flex-wrap:wrap;">
+          <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent)">2.4<span style="font-size:1rem">Gbps</span></div><div style="color:var(--muted)">Peak Download</div></div>
+          <div><div style="font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:var(--accent2)">12<span style="font-size:1rem">ms</span></div><div style="color:var(--muted)">Avg Latency</div></div>
+        </div>
+      </div>
+      <div>
+        <div class="speed-row"><div class="speed-info"><span>5G mmWave</span><span style="color:var(--accent)">2,400 Mbps</span></div><div class="speed-track"><div class="speed-fill" style="width:100%;background:var(--accent)"></div></div></div>
+        <div class="speed-row"><div class="speed-info"><span>5G Sub-6GHz</span><span style="color:var(--accent)">900 Mbps</span></div><div class="speed-track"><div class="speed-fill" style="width:37%;background:var(--accent)"></div></div></div>
+        <div class="speed-row"><div class="speed-info"><span>4G LTE Advanced</span><span style="color:var(--accent3)">300 Mbps</span></div><div class="speed-track"><div class="speed-fill" style="width:12%;background:var(--accent3)"></div></div></div>
+        <div class="speed-row"><div class="speed-info"><span>4G LTE</span><span style="color:var(--muted)">100 Mbps</span></div><div class="speed-track"><div class="speed-fill" style="width:4%;background:var(--muted)"></div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- COVERAGE -->
+  <section class="map-section" id="coverage">
+    <div class="section-header">
+      <div class="section-tag">// Network Coverage</div>
+      <div class="section-title">We're Everywhere</div>
+    </div>
+    <div class="map-container">
+      <div class="map-placeholder">
+        <div class="map-dots">
+          <div class="map-dot" style="left:15%;top:30%;animation-delay:0s"></div>
+          <div class="map-dot" style="left:28%;top:20%;animation-delay:.3s"></div>
+          <div class="map-dot" style="left:38%;top:35%;animation-delay:.6s"></div>
+          <div class="map-dot" style="left:52%;top:25%;animation-delay:.2s"></div>
+          <div class="map-dot" style="left:62%;top:40%;animation-delay:.8s"></div>
+          <div class="map-dot" style="left:72%;top:20%;animation-delay:.4s"></div>
+          <div class="map-dot" style="left:82%;top:50%;animation-delay:1s"></div>
+          <div class="map-dot" style="left:20%;top:65%;animation-delay:.5s;background:var(--accent3)"></div>
+          <div class="map-dot" style="left:45%;top:60%;animation-delay:.7s;background:var(--accent3)"></div>
+          <div class="map-dot" style="left:65%;top:70%;animation-delay:.1s;background:var(--accent3)"></div>
+          <div class="map-dot" style="left:85%;top:30%;animation-delay:.9s"></div>
+          <div class="map-dot" style="left:10%;top:50%;animation-delay:.35s;background:var(--accent2)"></div>
+        </div>
+        <div class="map-label">Global Network</div>
+      </div>
+      <div class="map-legend">
+        <div class="map-legend-item"><span class="legend-dot" style="background:var(--accent)"></span> 5G Coverage</div>
+        <div class="map-legend-item"><span class="legend-dot" style="background:var(--accent3)"></span> 4G LTE Coverage</div>
+        <div class="map-legend-item"><span class="legend-dot" style="background:var(--accent2)"></span> Roaming Partners</div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="logo">Data<span>Stream</span></div>
+      <div class="footer-links">
+        <a href="#" onclick="event.preventDefault();showToast('📄 Privacy policy coming soon!')">Privacy</a>
+        <a href="#" onclick="event.preventDefault();showToast('📋 Terms coming soon!')">Terms</a>
+        <a href="#" onclick="event.preventDefault();openContactModal()">Support</a>
+        <a href="#" onclick="event.preventDefault();showToast('🔧 API docs coming soon!')">API</a>
+      </div>
+      <div class="footer-text">© 2026 DataStream. All rights reserved.</div>
+    </div>
+  </footer>
+</div>
+
+<!-- PLAN MODAL -->
+<div class="modal-overlay" id="planModal" onclick="bgClose(event,'planModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('planModal')">✕</button>
+    <div id="planModalBody"></div>
+  </div>
+</div>
+
+<!-- CONTACT MODAL -->
+<div class="modal-overlay" id="contactModal" onclick="bgClose(event,'contactModal')">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close" onclick="closeModal('contactModal')">✕</button>
+    <div id="contactModalBody">
+      <div class="modal-tag">// Enterprise Sales</div>
+      <div class="modal-title">Talk to Our Team</div>
+      <div class="modal-sub">Get a custom plan for your business. We'll reach out within 24 hours.</div>
+      <input class="modal-input" type="text" id="cName" placeholder="Your Name">
+      <input class="modal-input" type="email" id="cEmail" placeholder="Work Email">
+      <input class="modal-input" type="text" id="cCompany" placeholder="Company Name">
+      <textarea class="modal-textarea" id="cMessage" placeholder="Tell us about your data needs..."></textarea>
+      <button class="modal-submit ms-orange" onclick="submitContact()">Send Message →</button>
+      <div class="modal-note">We respond within 24 hours · No spam ever</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
